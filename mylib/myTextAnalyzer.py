@@ -1,7 +1,7 @@
 import pandas as pd
+import streamlit as st
 
 def load_corpus_from_csv(data_filename, column) :
-
     data_df = pd.read_csv(data_filename)
     corpus = list(data_df[column])
     if data_df[column].isnull().sum() :
@@ -36,6 +36,7 @@ def set_korean_font_for_matplotlib(font_path) :
 
 def visualize_barhgraph(counter, num_words, title = None, xlabel = None , ylabel = None, font_path = None) :
     # 고빈도 단어를 num_words만큼 추출
+    plt.clf()
     wordcount_list = counter.most_common(num_words)
 
     # x 데이터와 y 데이터 분리
@@ -53,7 +54,8 @@ def visualize_barhgraph(counter, num_words, title = None, xlabel = None , ylabel
     if ylabel : plt.ylabel(ylabel)
 
     # 화면에 출력
-    plt.show()
+    plt.savefig("bar_chart.png")
+    st.pyplot(plt.gcf())
 
 from wordcloud import WordCloud
 def visualize_wordcloud(counter, num_words, font_path) :
@@ -67,10 +69,7 @@ def visualize_wordcloud(counter, num_words, font_path) :
     )
 
     # 빈도 리스트를 반영한 wordcloud 생성
-    wc = wc.generate_from_frequencies(counter)
-
-    # wordcloud를 matplotlib으로 화면에 그리기
-    plt.imshow(wc)
-    plt.axis('off')
-    plt.show()
-    
+    with st.spinner("워드 클라우드 생성중...") :
+        wc = wc.generate_from_frequencies(counter)
+        wc.to_file("wordcloud.png")
+        st.image("wordcloud.png")
